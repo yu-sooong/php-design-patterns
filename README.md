@@ -24,4 +24,4 @@
 ---
 
 
-![類別圖](https://raw.githubusercontent.com/yu-sooong/design-patterns-php/feature/ting/simple_factory/simple_factory.png "simple_factory")
+![類別圖](https://raw.githubusercontent.com/yu-sooong/ting-image/main/php-desing-patterns/simple_factory.drawio.png)
