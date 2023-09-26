@@ -3,10 +3,13 @@ language: php
 php:
   - 8.2
 
-before_install:
-  - phpenv global 8.2
+dist: focal
 
+addons:
+  apt:
+    packages:
+      - libonig5
 install:
-  - travis_retry composer install --no-interaction --prefer-dist --no-suggest
+  - composer install --prefer-dist --quiet
 
 script: vendor/bin/phpunit
