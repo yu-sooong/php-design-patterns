@@ -1,7 +1,10 @@
 language: php
 
 php:
-  - 8.2.0
+  - 8.2
+
+before_install:
+  - phpenv global 8.2
 
 install:
   - composer install --prefer-dist --quiet
