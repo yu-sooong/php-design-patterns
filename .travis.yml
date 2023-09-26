@@ -3,6 +3,12 @@ language: php
 php:
   - 8.2
 
+dist: focal
+
+addons:
+  apt:
+    packages:
+      - libonig5
 install:
   - composer install --prefer-dist --quiet
 
