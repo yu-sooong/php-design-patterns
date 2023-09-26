@@ -1,0 +1,56 @@
+# Here we are going to install PHP extension requirements that did not come
+FROM php:8.2-fpm-alpine3.18 as php-base
+    WORKDIR /var/www/html
+
+    RUN apk add --no-cache --virtual php_dependencies $PHPIZE_DEPS && \
+        apk add --no-cache libstdc++ && \
+        apk add --no-cache curl libzip-dev && \
+        apk add --no-cache linux-headers && \
+        docker-php-ext-install bcmath ctype pdo_mysql pcntl sockets zip exif && \
+        docker-php-ext-configure opcache --enable-opcache && \
+        docker-php-ext-install opcache && \
+        apk del php_dependencies && \
+        rm -rf /var/www && \
+        mkdir -p /var/www && \
+        chown -R www-data:www-data /var/www
+
+    ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+
+    RUN chmod +x /usr/local/bin/install-php-extensions && \
+        install-php-extensions xdebug amqp igbinary gd imagick redis zip
+
+# Here we have a build container so that it is not necessary to pull composer into
+# the final container. We are going to create a new Laravel project and install Octane.
+FROM php-base as laravel
+    ARG LARAVEL_VERSION="10.*"
+
+    COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+    RUN cd /var/www && \
+        composer create-project laravel/laravel="${LARAVEL_VERSION}" html && \
+        cd /var/www/html && \
+        rm "/var/www/html/.env"
+
+# This is our final container. We will copy over our built version of Laravel.
+FROM php-base
+    WORKDIR /var/www/html
+    USER www-data
+
+    COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+    COPY --from=laravel --chown=www-data:www-data /var/www/html/ /var/www/html
+
+    RUN composer install
+
+    # Check Vendor
+    RUN if [[ ! -d "vendor" ]] ; then \
+        composer install; \
+    fi;
+    # Check APP_KEY
+    RUN if [[ -e ".env" ]] ; then \
+        APP_KEY=$(sed -n 's/^APP_KEY=\([ 0-9a-zA-Z]*$\)/\1/p' .env); \
+        if [[ -z $APP_KEY ]] ; then \
+            php artisan key:generate; \
+        fi; \
+    fi;
+    RUN composer dump-autoload;
+
