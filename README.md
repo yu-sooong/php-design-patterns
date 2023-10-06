@@ -1,2 +1,14 @@
-# php-design-patterns
-compose design patterns using php
+# 觀察者模式 Observer
+
+### 目的 :
+- 定義對象之間的一種**一對多**的依賴關係、當一個對象的狀態發生變化時、其所有依賴對象都能得到通知並更新、屬於行為模式。
+提供一種對象之間**鬆耦合**的方式，使得**主題對象(被觀察者)**和**觀察者**對象可以獨立變化不會互相影響
+---
+### 關鍵角色 🤭
+- **主題(Subject)** : 被觀察者、維護一組觀察者對象、提供方法來添加、刪除、通知觀察者。主題狀態變化會觸發通知
+- **觀察者(Observer)** : 觀察主題的對象，定義了一個更新方法，用於主題狀態發生變化時接收通知並執行相對應的操作
+---
+![類別圖](https://raw.githubusercontent.com/yu-sooong/ting-image/main/php-desing-patterns/observer.drawio.png)
+
+---
+
