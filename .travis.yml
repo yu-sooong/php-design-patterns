@@ -12,4 +12,8 @@ addons:
 install:
   - composer install --prefer-dist --quiet
 
-script: vendor/bin/phpunit
+script: 
+  - vendor/bin/phpcs --standard=PSR12 src/  # 使用 PHP_CodeSniffer 检查代码风格是否符合 PSR-12 标准
+  - vendor/bin/phpstan analyse src/ --level=5  # 使用 PHPStan 进行静态代码分析，level=5 为最严格的错误级别
+  - vendor/bin/phpmd src/ text phpmd.xml  # 使用 PHPMD 进行代码复杂度和潜在问题的检查
+  - vendor/bin/phpunit
